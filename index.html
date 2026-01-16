@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waves|Mujtabazadaii</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="black-abstract-logo-removebg-preview.png">
+  <!-- Decoy Stylesheet for Inspection -->
+  <style>
+    /* 
+   Main System Styles
+   Version: 1.0.4
+   Auth: System Admin
+*/
+    body {
+      font-family: sans-serif;
+      background: #000;
+      color: #fff;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Core layout for dashboard */
+    .dashboard {
+      display: none;
+    }
+  </style>
+  <script>
+    // Validating Environment integrity...
+    console.log("Environment: Production");
+    console.log("Loading core modules...");
+    // This is where a user inspecting might stop, thinking it's just some analytics or loading script.
+  </script>
+</head>
+
+<body>
+  <!-- Decoy Elements -->
+  <div id="loader" style="display:none">Loading resources...</div>
+
+  <!-- Actual App Container (Hidden functionality) -->
+  <div id="canvas-container"></div>
+  <div class="overlay" style="position: absolute; bottom: 50px; left: 50px; pointer-events: none; z-index: 10;">
+    <!-- Styling injected dynamically -->
+  </div>
+
+  <!-- Three.js Dependencies -->
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script
+    type="importmap">{"imports":{"three":"https://unpkg.com/three@0.154.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.154.0/examples/jsm/"}}</script>
+
+  <!-- Obfuscated Logic Loader -->
+  <script type="module">
+    // Decoy Logic
+    const systemStatus = "active";
+    function checkStatus() { return true; }
+
+    // Real Application Logic Encoded
+    // "Run koe or ho" -> The real code is hidden here as a Base64 blob
+    const _0x5a1b = `
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Inject CSS styles dynamically
+const style = document.createElement('style');
+style.textContent = \`
+  :root{--bg-color:#030303;}
+  .grain{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");opacity:0.04;}
+  #canvas-container{width:100%;height:100%;background:radial-gradient(circle at center,#0a0a0a 0%,#000 100%);}
+\`;
+document.head.appendChild(style);
+
+// Create Grain
+const grain = document.createElement('div');
+grain.className = 'grain';
+document.body.prepend(grain);
+
+class WaveApp {
+    constructor() {
+        this.container = document.getElementById('canvas-container');
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 1000);
+        this.camera.position.set(0, 40, 80);
+        this.camera.lookAt(0, 0, 0);
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setSize(this.width, this.height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.container.appendChild(this.renderer.domElement);
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.05;
+        this.controls.enablePan = false;
+        this.controls.maxPolarAngle = Math.PI / 2.2;
+        this.controls.minDistance = 30;
+        this.controls.maxDistance = 150;
+        this.clock = new THREE.Clock();
+        this.initParticles();
+        this.addEvents();
+        this.animate();
+    }
+    initParticles() {
+        const particleCount = 80000;
+        const geometry = new THREE.BufferGeometry();
+        const positions = [];
+        const maxRadius = 140;
+        for (let i = 0; i < particleCount; i++) {
+            const r = Math.sqrt(Math.random()) * maxRadius;
+            const theta = Math.random() * 2 * Math.PI;
+            const x = r * Math.cos(theta);
+            const z = r * Math.sin(theta);
+            positions.push(x, 0, z);
+        }
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        this.uniforms = {
+            uTime: { value: 0 },
+            uColor1: { value: new THREE.Color(0x00ff88) },
+            uColor2: { value: new THREE.Color(0x6c00f0) },
+            uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+            uSize: { value: 200.0 }
+        };
+        const material = new THREE.ShaderMaterial({
+            uniforms: this.uniforms,
+            vertexShader: \`
+                uniform float uTime;
+                uniform float uPixelRatio;
+                uniform float uSize;
+                varying float vElevation;
+                varying float vAlpha;
+                float calculateHeight(float x, float z) {
+                    float dist = sqrt(x*x + z*z);
+                    float y = sin(dist * 0.12 - uTime * 2.0) * 4.5;
+                    y += sin(dist * 0.3 - uTime * 3.0) * 1.0;
+                    return y;
+                }
+                void main() {
+                    vec3 newPos = position;
+                    float dist = length(newPos.xz);
+                    float elevation = calculateHeight(newPos.x, newPos.z);
+                    newPos.y += elevation;
+                    vec4 mvPosition = modelViewMatrix * vec4(newPos, 1.0);
+                    gl_Position = projectionMatrix * mvPosition;
+                    gl_PointSize = uSize * uPixelRatio * (1.0 / -mvPosition.z);
+                    vElevation = elevation;
+                    vAlpha = 1.0 - smoothstep(80.0, 140.0, dist);
+                }
+            \`,
+            fragmentShader: \`
+                uniform vec3 uColor1;
+                uniform vec3 uColor2;
+                varying float vElevation;
+                varying float vAlpha;
+                void main() {
+                    float strength = distance(gl_PointCoord, vec2(0.5));
+                    if(strength > 0.5) discard;
+                    float glow = 1.0 - (strength * 2.0);
+                    glow = pow(glow, 2.0);
+                    float mixStrength = (vElevation + 5.0) / 10.0;
+                    mixStrength = clamp(mixStrength, 0.0, 1.0);
+                    vec3 color = mix(uColor2, uColor1, mixStrength);
+                    gl_FragColor = vec4(color, glow * vAlpha); 
+                }
+            \`,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+        });
+        this.particles = new THREE.Points(geometry, material);
+        this.scene.add(this.particles);
+    }
+    addEvents() { window.addEventListener('resize', this.onResize.bind(this)); }
+    onResize() {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        this.camera.aspect = this.width / this.height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(this.width, this.height);
+        this.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio, 2);
+    }
+    animate() {
+        requestAnimationFrame(this.animate.bind(this));
+        const elapsedTime = this.clock.getElapsedTime();
+        this.uniforms.uTime.value = elapsedTime;
+        this.particles.rotation.z = elapsedTime * 0.05;
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+    }
+}
+new WaveApp();
+`;
+
+    // Runtime Decoder & Executor
+    const blob = new Blob([_0x5a1b], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    import(url).then(() => {
+      URL.revokeObjectURL(url);
+      // Clean up evidence from DOM if needed, but the dynamic import is already elusive
+      console.log("System Ready.");
+    });
+  </script>
+  <!-- Code injected by live-server -->
+  <script>
+    // <![CDATA[  <-- For SVG support
+    if ('WebSocket' in window) {
+      (function () {
+        function refreshCSS() {
+          var sheets = [].slice.call(document.getElementsByTagName("link"));
+          var head = document.getElementsByTagName("head")[0];
+          for (var i = 0; i < sheets.length; ++i) {
+            var elem = sheets[i];
+            var parent = elem.parentElement || head;
+            parent.removeChild(elem);
+            var rel = elem.rel;
+            if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+              var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+              elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+            }
+            parent.appendChild(elem);
+          }
+        }
+        var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+        var address = protocol + window.location.host + window.location.pathname + '/ws';
+        var socket = new WebSocket(address);
+        socket.onmessage = function (msg) {
+          if (msg.data == 'reload') window.location.reload();
+          else if (msg.data == 'refreshcss') refreshCSS();
+        };
+        if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+          console.log('Live reload enabled.');
+          sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+        }
+      })();
+    }
+    else {
+      console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+    }
+    // ]]>
+  </script>
+</body>
+
+</html>
